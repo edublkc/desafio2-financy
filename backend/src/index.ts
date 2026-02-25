@@ -37,7 +37,7 @@ async function bootstrap() {
 
   app.listen(
     { port: 4000 },
-    () => console.log(`Servidor executando na porta: 4000`)
+    () => console.log(`Backend iniciado na porta 4000`)
   )
 }
 
