@@ -12,8 +12,6 @@
 
 - Instale os pacotes: `npm install`
 
-- Faça as migrations executando: `npx prisma generate`
-
 - Inicie o Servidor executando: `npm run dev`
 
 
