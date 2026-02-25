@@ -1,0 +1,122 @@
+type ColorValues =
+  | "gray-800" | "gray-700" | "gray-600" | "gray-500" | "gray-400" | "gray-300" | "gray-200" | "gray-100"
+  | "danger" | "success"
+  | "blue-dark" | "blue-base" | "blue-light"
+  | "purple-dark" | "purple-base" | "purple-light"
+  | "pink-dark" | "pink-base" | "pink-light"
+  | "red-dark" | "red-base" | "red-light"
+  | "orange-dark" | "orange-base" | "orange-light"
+  | "yellow-dark" | "yellow-base" | "yellow-light"
+  | "green-dark" | "green-base" | "green-light"
+  | "brand-base" | "brand-dark";
+
+const textColorMap: Record<ColorValues, string> = {
+  "gray-800": "text-gray-800",
+  "gray-700": "text-gray-700",
+  "gray-600": "text-gray-600",
+  "gray-500": "text-gray-500",
+  "gray-400": "text-gray-400",
+  "gray-300": "text-gray-300",
+  "gray-200": "text-gray-200",
+  "gray-100": "text-gray-100",
+  "danger": "text-danger",
+  "success": "text-success",
+  "blue-dark": "text-blue-dark",
+  "blue-base": "text-blue-base",
+  "blue-light": "text-blue-light",
+  "purple-dark": "text-purple-dark",
+  "purple-base": "text-purple-base",
+  "purple-light": "text-purple-light",
+  "pink-dark": "text-pink-dark",
+  "pink-base": "text-pink-base",
+  "pink-light": "text-pink-light",
+  "red-dark": "text-red-dark",
+  "red-base": "text-red-base",
+  "red-light": "text-red-light",
+  "orange-dark": "text-orange-dark",
+  "orange-base": "text-orange-base",
+  "orange-light": "text-orange-light",
+  "yellow-dark": "text-yellow-dark",
+  "yellow-base": "text-yellow-base",
+  "yellow-light": "text-yellow-light",
+  "green-dark": "text-green-dark",
+  "green-base": "text-green-base",
+  "green-light": "text-green-light",
+  "brand-base": "text-brand-base",
+  "brand-dark": "text-brand-dark",
+};
+
+const bgColorMap: Record<ColorValues, string> = {
+  "gray-800": "bg-gray-800",
+  "gray-700": "bg-gray-700",
+  "gray-600": "bg-gray-600",
+  "gray-500": "bg-gray-500",
+  "gray-400": "bg-gray-400",
+  "gray-300": "bg-gray-300",
+  "gray-200": "bg-gray-200",
+  "gray-100": "bg-gray-100",
+  "danger": "bg-danger",
+  "success": "bg-success",
+  "blue-dark": "bg-blue-dark",
+  "blue-base": "bg-blue-base",
+  "blue-light": "bg-blue-light",
+  "purple-dark": "bg-purple-dark",
+  "purple-base": "bg-purple-base",
+  "purple-light": "bg-purple-light",
+  "pink-dark": "bg-pink-dark",
+  "pink-base": "bg-pink-base",
+  "pink-light": "bg-pink-light",
+  "red-dark": "bg-red-dark",
+  "red-base": "bg-red-base",
+  "red-light": "bg-red-light",
+  "orange-dark": "bg-orange-dark",
+  "orange-base": "bg-orange-base",
+  "orange-light": "bg-orange-light",
+  "yellow-dark": "bg-yellow-dark",
+  "yellow-base": "bg-yellow-base",
+  "yellow-light": "bg-yellow-light",
+  "green-dark": "bg-green-dark",
+  "green-base": "bg-green-base",
+  "green-light": "bg-green-light",
+  "brand-base": "bg-brand-base",
+  "brand-dark": "bg-brand-dark",
+};
+
+const borderColorMap: Record<ColorValues, string> = {
+  "gray-800": "border-gray-800",
+  "gray-700": "border-gray-700",
+  "gray-600": "border-gray-600",
+  "gray-500": "border-gray-500",
+  "gray-400": "border-gray-400",
+  "gray-300": "border-gray-300",
+  "gray-200": "border-gray-200",
+  "gray-100": "border-gray-100",
+  "danger": "border-danger",
+  "success": "border-success",
+  "blue-dark": "border-blue-dark",
+  "blue-base": "border-blue-base",
+  "blue-light": "border-blue-light",
+  "purple-dark": "border-purple-dark",
+  "purple-base": "border-purple-base",
+  "purple-light": "border-purple-light",
+  "pink-dark": "border-pink-dark",
+  "pink-base": "border-pink-base",
+  "pink-light": "border-pink-light",
+  "red-dark": "border-red-dark",
+  "red-base": "border-red-base",
+  "red-light": "border-red-light",
+  "orange-dark": "border-orange-dark",
+  "orange-base": "border-orange-base",
+  "orange-light": "border-orange-light",
+  "yellow-dark": "border-yellow-dark",
+  "yellow-base": "border-yellow-base",
+  "yellow-light": "border-yellow-light",
+  "green-dark": "border-green-dark",
+  "green-base": "border-green-base",
+  "green-light": "border-green-light",
+  "brand-base": "border-brand-base",
+  "brand-dark": "border-brand-dark",
+};
+
+export { textColorMap, bgColorMap, borderColorMap };
+export type { ColorValues };
