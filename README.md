@@ -7,7 +7,7 @@
 
 2 - Crie uma copia das variaveis ambiente de exemplo: `cp .env.example .env`
 
-3 - Execute as migrations: `npx prisma generate`
+3 - Execute as migrations: `npx prisma migrate dev`
 
 4 - Rode o server: `npm run dev`
 
