@@ -20,6 +20,7 @@ interface CreateTransactionDialogProps {
 }
 
 export function CreateTransactionDialog({ open, onOpenChange, transaction }: CreateTransactionDialogProps) {
+
   const [description, setDescription] = useState("")
   const [date, setDate] = useState("")
   const [amount, setAmount] = useState<number>()
@@ -31,53 +32,31 @@ export function CreateTransactionDialog({ open, onOpenChange, transaction }: Cre
 
   useEffect(() => {
     if (transaction && open) {
+
       setDescription(transaction.description)
       setDate(new Date(transaction.date).toISOString().split("T")[0])
       setAmount(Math.abs(transaction.amount))
       setType(transaction.amount < 0 ? TransactionTypes.Output : TransactionTypes.Input)
       setCategoryId(transaction.categoryId)
+
     } else if (!open) {
+
       setDescription("")
       setDate("")
       setAmount(undefined)
       setCategoryId(undefined)
       setType(TransactionTypes.Output)
+
     }
   }, [transaction, open])
 
-  const [createTransaction, { loading: loadingCreate }] = useMutation(CREATE_TRANSACTION, {
-    onCompleted(data, _) {
-      if (data) {
-        toast.success("Transação criada com sucesso")
-        onOpenChange(false)
-      }
-    },
-    onError() {
-      toast.error("Falha ao criar a transação")
-    },
-    refetchQueries: [
-      { query: LIST_TRANSACTIONS_DASHBOARD },
-      { query: LIST_CATEGORIES_DASHBOARD }
-    ],
-  })
+  const [createTransaction, { loading: loadingCreate }] = useMutation(CREATE_TRANSACTION)
+  const [updateTransaction, { loading: loadingUpdate }] = useMutation(UPDATE_TRANSACTION)
 
-  const [updateTransaction, { loading: loadingUpdate }] = useMutation(UPDATE_TRANSACTION, {
-    onCompleted(data, _) {
-      if (data) {
-        toast.success("Transação atualizada com sucesso")
-        onOpenChange(false)
-      }
-    },
-    onError() {
-      toast.error("Falha ao atualizar a transação")
-    },
-    refetchQueries: [
-      { query: LIST_TRANSACTIONS_DASHBOARD },
-      { query: LIST_CATEGORIES_DASHBOARD }
-    ],
-  })
+  const loading = loadingCreate || loadingUpdate
 
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault()
 
     const payload = {
@@ -88,100 +67,164 @@ export function CreateTransactionDialog({ open, onOpenChange, transaction }: Cre
       date: new Date(date + "T00:00:00"),
     }
 
-    if (transaction?.id) {
-      updateTransaction({
-        variables: {
-          updateTransactionId: transaction.id,
-          data: payload
-        }
-      })
-      return
+    try {
+
+      if (transaction?.id) {
+
+        await updateTransaction({
+          variables: {
+            updateTransactionId: transaction.id,
+            data: payload
+          },
+          refetchQueries: [
+            { query: LIST_TRANSACTIONS_DASHBOARD },
+            { query: LIST_CATEGORIES_DASHBOARD }
+          ]
+        })
+
+        toast.success("Transação atualizada com sucesso")
+
+      } else {
+
+        await createTransaction({
+          variables: {
+            data: payload,
+            categoryId: categoryId
+          },
+          refetchQueries: [
+            { query: LIST_TRANSACTIONS_DASHBOARD },
+            { query: LIST_CATEGORIES_DASHBOARD }
+          ]
+        })
+
+        toast.success("Transação criada com sucesso")
+
+      }
+
+      onOpenChange(false)
+
+    } catch (error) {
+
+      console.error(error)
+
+      toast.error(
+        transaction?.id
+          ? "Falha ao atualizar a transação"
+          : "Falha ao criar a transação"
+      )
+
     }
 
-    createTransaction({
-      variables: {
-        data: payload,
-        categoryId: categoryId
-      }
-    })
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+
         <DialogHeader className="space-y-1">
-          <DialogTitle className="text-base font-semibold text-gray-800">Nova Transação</DialogTitle>
+          <DialogTitle className="text-base font-semibold text-gray-800">
+            {transaction ? "Editar Transação" : "Nova Transação"}
+          </DialogTitle>
+
           <DialogDescription className="text-sm text-gray-600">
             Registre sua despesa ou receita
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit}>
 
           <TransactioType selected={type} onChange={setType} />
 
-          <Label htmlFor="description" className="text-sm text-gray-700 font-medium">Descrição</Label>
+          <Label htmlFor="description" className="text-sm text-gray-700 font-medium">
+            Descrição
+          </Label>
+
           <Input
             id="description"
             placeholder="Ex. Almoço no restaurante"
             value={description}
             onChange={e => setDescription(e.target.value)}
-            disabled={loadingCreate || loadingUpdate}
+            disabled={loading}
           />
 
           <div className="flex items-center gap-4 py-4">
+
             <div className="flex flex-col w-full">
-              <Label htmlFor="date" className="text-sm text-gray-700 font-medium">Data</Label>
+
+              <Label htmlFor="date" className="text-sm text-gray-700 font-medium">
+                Data
+              </Label>
+
               <Input
                 id="date"
                 type="date"
-                placeholder="Selecione"
                 value={date}
                 onChange={e => setDate(e.target.value)}
-                disabled={loadingCreate || loadingUpdate}
+                disabled={loading}
               />
+
             </div>
+
             <div className="flex flex-col w-full">
-              <Label htmlFor="amount" className="text-sm text-gray-700 font-medium">Valor</Label>
+
+              <Label htmlFor="amount" className="text-sm text-gray-700 font-medium">
+                Valor
+              </Label>
+
               <Input
                 id="amount"
                 type="number"
                 step="0.01"
-                placeholder="RS 0,00"
+                placeholder="R$ 0,00"
                 value={amount}
                 onChange={e => setAmount(+e.target.value)}
-                disabled={loadingCreate || loadingUpdate}
+                disabled={loading}
               />
+
             </div>
 
           </div>
 
-          <Label htmlFor="category" className="text-sm text-gray-700 font-medium">Categoria</Label>
+          <Label htmlFor="category" className="text-sm text-gray-700 font-medium">
+            Categoria
+          </Label>
+
           <Select
             value={categoryId}
             onValueChange={e => setCategoryId(e)}
-            disabled={loadingCreate || loadingUpdate || transaction?.id !== undefined}
+            disabled={loading || transaction?.id !== undefined}
           >
+
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
+
             <SelectContent>
               <SelectGroup>
+
                 <SelectLabel>Categorias</SelectLabel>
-                {
-                  categories.map(category => (
-                    <SelectItem value={category.id} key={category.id}>{category.title}</SelectItem>
-                  ))
-                }
+
+                {categories.map(category => (
+                  <SelectItem value={category.id} key={category.id}>
+                    {category.title}
+                  </SelectItem>
+                ))}
+
               </SelectGroup>
             </SelectContent>
+
           </Select>
 
           <Button
             type="submit"
             className="w-full bg-brand-base mt-4"
-            disabled={loadingCreate || loadingUpdate}
-          >Salvar</Button>
+            disabled={loading}
+          >
+            {loading ? "Salvando..." : "Salvar"}
+          </Button>
+
         </form>
+
       </DialogContent>
     </Dialog>
   )

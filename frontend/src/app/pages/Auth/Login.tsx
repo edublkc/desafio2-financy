@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 
-import logo from "@/assets/logo.svg";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,7 +38,7 @@ export function Login() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)] items-center justify-center gap-6">
-      <img src={logo} className="w-36 h-8" />
+      <img src="./logo.svg" className="w-36 h-8" />
       <Card className="w-full max-w-md rounded-xl">
         <CardHeader className="items-center">
           <CardTitle className="text-xl font-bold">

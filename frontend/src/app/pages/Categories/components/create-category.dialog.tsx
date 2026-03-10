@@ -24,93 +24,105 @@ const ICON_LIST = [
   "ShoppingCartIcon", "TicketIcon", "ToolCaseIcon", "UtensilsIcon",
   "PawPrintIcon", "HouseIcon", "GiftIcon", "DumbbellIcon",
   "BookOpenIcon", "BaggageClaimIcon", "MailboxIcon", "ReceiptTextIcon",
-];
+]
 
 const COLOR_LIST = [
   "green-base", "blue-base", "purple-base", "pink-base",
   "red-base", "orange-base", "yellow-base"
-];
+]
 
 export function CreateCategoryDialog({ open, onOpenChange, category }: CreateCategoryDialogProps) {
-  const [title, setTitle] = useState<string>(category ? category.title : '')
-  const [description, setDescription] = useState(category ? category.description : '')
-  const [selectedIcon, setSelectedIcon] = useState(category?.iconName || '')
-  const [selectedColor, setSelectedColor] = useState(category?.iconColor || 'gray-500')
+
+  const [title, setTitle] = useState<string>(category ? category.title : "")
+  const [description, setDescription] = useState(category ? category.description : "")
+  const [selectedIcon, setSelectedIcon] = useState(category?.iconName || "")
+  const [selectedColor, setSelectedColor] = useState(category?.iconColor || "gray-500")
 
   useEffect(() => {
     if (category && open) {
       setTitle(category.title)
       setDescription(category.description)
-      setSelectedIcon(category?.iconName ?? '')
-      setSelectedColor(category?.iconColor ?? '')
+      setSelectedIcon(category?.iconName ?? "")
+      setSelectedColor(category?.iconColor ?? "")
     } else if (!open) {
-      setTitle('')
-      setDescription('')
-      setSelectedIcon('')
-      setSelectedColor('gray-500')
+      setTitle("")
+      setDescription("")
+      setSelectedIcon("")
+      setSelectedColor("gray-500")
     }
   }, [category, open])
 
-  const [createCategory, { loading: loadingCreate }] = useMutation(CREATE_CATEGORY, {
-    onCompleted(data, _) {
-      if (data) {
-        toast.success("Categoria criada com sucesso")
-        onOpenChange(false)
-      }
-    },
-    onError() {
-      toast.error("Falha ao criar a categoria")
-    },
-    refetchQueries: [{ query: LIST_CATEGORIES_DASHBOARD }],
-  })
+  const [createCategory, { loading: loadingCreate }] = useMutation(CREATE_CATEGORY)
+  const [updateCategory, { loading: loadingUpdate }] = useMutation(UPDATE_CATEGORY)
 
-  const [updateCategory, { loading: loadingUpdate }] = useMutation(UPDATE_CATEGORY, {
-    onCompleted(data, _) {
-      if (data) {
-        toast.success("Categoria atualizada com sucesso")
-        onOpenChange(false)
-      }
-    },
-    onError() {
-      toast.error("Falha ao atualizar a categoria")
-    },
-    refetchQueries: [{ query: LIST_CATEGORIES_DASHBOARD }],
-  })
+  const loading = loadingCreate || loadingUpdate
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const payload = { title, description, iconName: selectedIcon, iconColor: selectedColor };
-
-    if (category?.id) {
-      updateCategory({
-        variables: {
-          updateCategoryId: category.id,
-          data: payload
-        }
-      })
-      return
+    const payload = {
+      title,
+      description,
+      iconName: selectedIcon,
+      iconColor: selectedColor
     }
 
-    createCategory({
-      variables: {
-        data: payload
+    try {
+
+      if (category?.id) {
+        await updateCategory({
+          variables: {
+            updateCategoryId: category.id,
+            data: payload
+          },
+          refetchQueries: [{ query: LIST_CATEGORIES_DASHBOARD }]
+        })
+
+        toast.success("Categoria atualizada com sucesso")
+      } else {
+
+        await createCategory({
+          variables: {
+            data: payload
+          },
+          refetchQueries: [{ query: LIST_CATEGORIES_DASHBOARD }]
+        })
+
+        toast.success("Categoria criada com sucesso")
       }
-    })
+
+      onOpenChange(false)
+
+    } catch (error) {
+      console.error(error)
+      toast.error(
+        category?.id
+          ? "Falha ao atualizar a categoria"
+          : "Falha ao criar a categoria"
+      )
+    }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+
         <DialogHeader className="space-y-1">
-          <DialogTitle className="text-base font-semibold text-gray-800">Nova categoria</DialogTitle>
+          <DialogTitle className="text-base font-semibold text-gray-800">
+            {category ? "Editar categoria" : "Nova categoria"}
+          </DialogTitle>
+
           <DialogDescription className="text-sm text-gray-600">
             Organize suas transações com categorias
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit}>
 
-          <Label htmlFor="title" className="text-sm text-gray-700 font-medium">Título</Label>
+          <Label htmlFor="title" className="text-sm text-gray-700 font-medium">
+            Título
+          </Label>
+
           <Input
             id="title"
             placeholder="Ex. Alimentação"
@@ -120,7 +132,11 @@ export function CreateCategoryDialog({ open, onOpenChange, category }: CreateCat
 
           <div className="flex items-center gap-4 py-4">
             <div className="flex flex-col w-full">
-              <Label htmlFor="description" className="text-sm text-gray-700 font-medium">Data</Label>
+
+              <Label htmlFor="description" className="text-sm text-gray-700 font-medium">
+                Data
+              </Label>
+
               <Input
                 id="description"
                 type="description"
@@ -128,11 +144,18 @@ export function CreateCategoryDialog({ open, onOpenChange, category }: CreateCat
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <Label htmlFor="optional" className="text-xs text-gray-500 mt-1">Opcional</Label>
+
+              <Label htmlFor="optional" className="text-xs text-gray-500 mt-1">
+                Opcional
+              </Label>
+
             </div>
           </div>
 
-          <Label htmlFor="icon" className="text-sm text-gray-700 font-medium">Ícone</Label>
+          <Label htmlFor="icon" className="text-sm text-gray-700 font-medium">
+            Ícone
+          </Label>
+
           <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mt-2 max-h-[200px] overflow-y-auto p-1">
             {ICON_LIST.map((iconName) => (
               <IconOption
@@ -144,7 +167,10 @@ export function CreateCategoryDialog({ open, onOpenChange, category }: CreateCat
             ))}
           </div>
 
-          <Label htmlFor="icon" className="text-sm text-gray-700 font-medium">Cor</Label>
+          <Label htmlFor="icon" className="text-sm text-gray-700 font-medium">
+            Cor
+          </Label>
+
           <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mt-2 max-h-[200px] overflow-y-auto p-1">
             {COLOR_LIST.map((colorName) => (
               <ColorOption
@@ -159,8 +185,11 @@ export function CreateCategoryDialog({ open, onOpenChange, category }: CreateCat
           <Button
             type="submit"
             className="w-full bg-brand-base mt-4"
-            disabled={loadingCreate || loadingUpdate}
-          >Salvar</Button>
+            disabled={loading}
+          >
+            {loading ? "Salvando..." : "Salvar"}
+          </Button>
+
         </form>
       </DialogContent>
     </Dialog>
